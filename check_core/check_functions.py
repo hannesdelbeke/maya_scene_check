@@ -353,7 +353,7 @@ def uv_face_cross_quadrant(mesh_name):
                         component_name = '{0}.f[{1}]'.format(mesh_name, face_it.index())
                         if component_name not in uv_face_list:
                             uv_face_list.append(component_name)
-                        print index, uv_coordinates
+                        print(index, uv_coordinates)
             # v
             if index == 1:
                 for v_coordinate in uv_coordinates:
@@ -363,7 +363,7 @@ def uv_face_cross_quadrant(mesh_name):
                         component_name = '{0}.f[{1}]'.format(mesh_name, face_it.index())
                         if component_name not in uv_face_list:
                             uv_face_list.append(component_name)
-                        print index, uv_coordinates
+                        print(index, uv_coordinates)
 
         face_it.next(None)
     return uv_face_list
@@ -411,7 +411,7 @@ def find_double_faces(mesh_name):
     while not vertex_it.isDone():
         connect_faces = vertex_it.getConnectedFaces()
         connect_edges = vertex_it.getConnectedEdges()
-        # print connect_faces, connect_edges
+        # print(connect_faces, connect_edges)
         if len(connect_faces) == 5 and len(connect_edges) == 4:
 
             vertex_indices.append(vertex_it.index())
@@ -419,11 +419,11 @@ def find_double_faces(mesh_name):
                 face_id = list(connect_faces)
             else:
                 face_id = list(set(face_id).intersection(set(list(connect_faces))))
-            print face_id
+            print(face_id)
         vertex_it.next()
     cmds.select(['{0}.f[{1}]'.format(mesh_name, a) for a in face_id])
 
 
 if __name__ == '__main__':
     mesh_name = '|group3|pSphere1'
-    print find_unfrozen_vertices(mesh_name)
+    print(find_unfrozen_vertices(mesh_name))
