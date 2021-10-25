@@ -89,7 +89,9 @@ def find_non_manifold_edges(mesh_name):
         if face_count > 2:
             edge_indices.append(edge_it.index())
         edge_it.next()
-    return edge_indices
+
+    return ['{0}.v[{1}]'.format(mesh_name, a) for a in edge_indices]
+    # return edge_indices
 
 
 def find_lamina_faces(mesh_name):
@@ -113,7 +115,8 @@ def find_lamina_faces(mesh_name):
             poly_indices.append(poly_it.index())
         poly_it.next(1)
 
-    return poly_indices
+    return ['{0}.f[{1}]'.format(mesh_name, a) for a in poly_indices]
+    # return poly_indices
 
 
 def find_bivalent_faces(mesh_name):
@@ -138,7 +141,8 @@ def find_bivalent_faces(mesh_name):
             vertex_indices.append(vertex_it.index())
         vertex_it.next()
 
-    return vertex_indices
+    return ['{0}.v[{1}]'.format(mesh_name, a) for a in vertex_indices]
+    # return vertex_indices
 
 
 def find_zero_area_faces(mesh_name, max_face_area):
@@ -162,7 +166,8 @@ def find_zero_area_faces(mesh_name, max_face_area):
             poly_indices.append(poly_it.index())
         poly_it.next(1)
 
-    return poly_indices
+    return ['{0}.f[{1}]'.format(mesh_name, a) for a in poly_indices]
+    # return poly_indices
 
 
 def find_mesh_border_edges(mesh_name):
@@ -184,7 +189,9 @@ def find_mesh_border_edges(mesh_name):
         if edge_it.onBoundary():
             edge_indices.append(edge_it.index())
         edge_it.next()
-    return edge_indices
+
+    return ['{0}.e[{1}]'.format(mesh_name, a) for a in edge_indices]
+    # return edge_indices
 
 
 def find_crease_edges(mesh_name):
@@ -207,7 +214,9 @@ def find_crease_edges(mesh_name):
     for index in xrange(len(edge_ids)):
         if crease_data[index] != 0:
             edge_indices.append(edge_ids[index])
-    return edge_indices
+
+    return ['{0}.e[{1}]'.format(mesh_name, a) for a in edge_indices]
+    # return edge_indices
 
 
 def find_zero_length_edges(mesh_name, min_edge_length):
@@ -230,7 +239,9 @@ def find_zero_length_edges(mesh_name, min_edge_length):
         if edge_it.length() < min_edge_length:
             edge_indices.append(edge_it.index())
         edge_it.next()
-    return edge_indices
+
+    return ['{0}.e[{1}]'.format(mesh_name, a) for a in edge_indices]
+    # return edge_indices
 
 
 def find_unfrozen_vertices(mesh_name):
@@ -263,7 +274,9 @@ def find_unfrozen_vertices(mesh_name):
                 xyz[a] = xyz_plug.child(a).asFloat()
             if not (abs(xyz[0]) <= 0.0 and abs(xyz[1]) <= 0.0 and abs(xyz[2]) <= 0.0):
                 vertice_indices.append(i)
-    return vertice_indices
+
+    return ['{0}.v[{1}]'.format(mesh_name, a) for a in vertice_indices]
+    # return vertice_indices
 
 
 def has_vertex_pnts_attr(mesh_name, fix):
