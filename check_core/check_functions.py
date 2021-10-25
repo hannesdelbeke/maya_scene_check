@@ -329,7 +329,7 @@ def uv_face_cross_quadrant(mesh_name):
     Check uv face cross quadrant
     :param str mesh_name: object long name eg.'|group3|pSphere1'
     :return: face index
-    :rtype: list
+    :rtype: list [string({mesh_name}.f[{face index}]), ...]
     """
     mesh_list = om.MSelectionList()
     mesh_list.add(mesh_name)
@@ -396,7 +396,7 @@ def find_double_faces(mesh_name):
     """
     Check all points common to both faces
     :param str mesh_name: object long name eg.'|group3|pSphere1'
-    :return: vertex index
+    :return: face index
     :rtype: list
     """
     mesh_list = om.MSelectionList()
@@ -421,9 +421,7 @@ def find_double_faces(mesh_name):
                 face_id = list(set(face_id).intersection(set(list(connect_faces))))
             print face_id
         vertex_it.next()
-    cmds.select(['{0}.f[{1}]'.format(mesh_name, a) for a in face_id])
 
+    return ['{0}.f[{1}]'.format(mesh_name, a) for a in face_id]
+    #cmds.select(['{0}.f[{1}]'.format(mesh_name, a) for a in face_id])
 
-if __name__ == '__main__':
-    mesh_name = '|group3|pSphere1'
-    print find_unfrozen_vertices(mesh_name)
