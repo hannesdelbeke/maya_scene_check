@@ -25,6 +25,12 @@ maya check functions:
 import maya.cmds as cmds
 import maya.api.OpenMaya as om
 
+# python 2 compatibility
+# try:
+#     range = xrange
+# except NameError:
+#     pass
+
 
 def find_triangle_edge(mesh_name):
     """
@@ -41,7 +47,7 @@ def find_triangle_edge(mesh_name):
     mfn_mesh = om.MFnMesh(dag_path)
     face_numbers = mfn_mesh.numPolygons
 
-    triangle_face_list = ['{0}.f[{1}]'.format(cmds.listRelatives(mesh_name, p=1)[0], a) for a in xrange(face_numbers) if
+    triangle_face_list = ['{0}.f[{1}]'.format(cmds.listRelatives(mesh_name, p=1)[0], a) for a in range(face_numbers) if
                           mfn_mesh.polygonVertexCount(a) < 4]
 
     return triangle_face_list
@@ -62,7 +68,7 @@ def find_many_edge(mesh_name):
     mfn_mesh = om.MFnMesh(dag_path)
     face_numbers = mfn_mesh.numPolygons
 
-    triangle_face_list = ['{0}.f[{1}]'.format(cmds.listRelatives(mesh_name, p=1)[0], a) for a in xrange(face_numbers) if
+    triangle_face_list = ['{0}.f[{1}]'.format(cmds.listRelatives(mesh_name, p=1)[0], a) for a in range(face_numbers) if
                           mfn_mesh.polygonVertexCount(a) >= 5]
 
     return triangle_face_list
@@ -90,7 +96,7 @@ def find_non_manifold_edges(mesh_name):
             edge_indices.append(edge_it.index())
         edge_it.next()
 
-    return ['{0}.v[{1}]'.format(mesh_name, a) for a in edge_indices]
+    return ['{0}.e[{1}]'.format(mesh_name, a) for a in edge_indices]
     # return edge_indices
 
 
@@ -141,7 +147,7 @@ def find_bivalent_faces(mesh_name):
             vertex_indices.append(vertex_it.index())
         vertex_it.next()
 
-    return ['{0}.v[{1}]'.format(mesh_name, a) for a in vertex_indices]
+    return ['{0}.vtx[{1}]'.format(mesh_name, a) for a in vertex_indices]
     # return vertex_indices
 
 
@@ -211,7 +217,7 @@ def find_crease_edges(mesh_name):
 
     edge_indices = []
 
-    for index in xrange(len(edge_ids)):
+    for index in range(len(edge_ids)):
         if crease_data[index] != 0:
             edge_indices.append(edge_ids[index])
 
@@ -264,18 +270,18 @@ def find_unfrozen_vertices(mesh_name):
 
     num_vertices = mesh_fn.numVertices
 
-    vertice_indices = []
+    vertex_indices = []
 
-    for i in xrange(num_vertices):
+    for i in range(num_vertices):
         xyz_plug = pnts_plug.elementByLogicalIndex(i)
         if xyz_plug.isCompound:
             xyz = [0.0, 0.0, 0.0]
             for a in range(3):
                 xyz[a] = xyz_plug.child(a).asFloat()
             if not (abs(xyz[0]) <= 0.0 and abs(xyz[1]) <= 0.0 and abs(xyz[2]) <= 0.0):
-                vertice_indices.append(i)
+                vertex_indices.append(i)
 
-    return ['{0}.v[{1}]'.format(mesh_name, a) for a in vertice_indices]
+    return ['{0}.vtx[{1}]'.format(mesh_name, a) for a in vertex_indices]
     # return vertice_indices
 
 
@@ -368,7 +374,6 @@ def uv_face_cross_quadrant(mesh_name, accuracy=0.001):
                         component_name = '{0}.f[{1}]'.format(mesh_name, face_it.index())
                         if component_name not in uv_face_list:
                             uv_face_list.append(component_name)
-                        print(index, uv_coordinates)
             # v
             if index == 1:
                 for v_coordinate in uv_coordinates:
@@ -380,7 +385,6 @@ def uv_face_cross_quadrant(mesh_name, accuracy=0.001):
                         component_name = '{0}.f[{1}]'.format(mesh_name, face_it.index())
                         if component_name not in uv_face_list:
                             uv_face_list.append(component_name)
-                        print(index, uv_coordinates)
 
         face_it.next(None)
     return uv_face_list
@@ -428,7 +432,6 @@ def find_double_faces(mesh_name):
     while not vertex_it.isDone():
         connect_faces = vertex_it.getConnectedFaces()
         connect_edges = vertex_it.getConnectedEdges()
-        # print(connect_faces, connect_edges)
         if len(connect_faces) == 5 and len(connect_edges) == 4:
 
             vertex_indices.append(vertex_it.index())
@@ -436,9 +439,7 @@ def find_double_faces(mesh_name):
                 face_id = list(connect_faces)
             else:
                 face_id = list(set(face_id).intersection(set(list(connect_faces))))
-            print face_id
         vertex_it.next()
 
     return ['{0}.f[{1}]'.format(mesh_name, a) for a in face_id]
-    #cmds.select(['{0}.f[{1}]'.format(mesh_name, a) for a in face_id])
 
