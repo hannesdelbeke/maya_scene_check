@@ -26,18 +26,33 @@ class CollectMeshNames(pyblish.api.Collector):
             instance.append(mesh_name_long)
 
 
+def get_failed_instances(context, plugin):
+    instances = []
+    for result in context.data["results"]:
+        if result["error"] and result["plugin"] == plugin:
+            instance = result["instance"]
+            instances.extend(instance)
+    return instances
+
+
 class ActionSelect(pyblish.api.Action):
     label = "Select failed"
     on = "failedOrWarning"
     icon = "hand-o-up"  # Icon from Awesome Icon
 
     def process(self, context, plugin):
-        errors = context.data[plugin.label]  # list of strings, ex. ['pCube2.f[0]',...]
-        print(errors)
+        errors = []
+        if context.data:
+            errors = context.data.get(plugin.label, [])  # list of strings, ex. ['pCube2.f[0]',...]
 
         # # this currently selects all instances, not just failed ones, but is a cleaner way than what we do now
         # instances = pyblish.api.instances_by_plugin(context, plugin)
-        # errors = instances
+        failed_instances = get_failed_instances(context, plugin)
+        for instance in failed_instances:
+            if instance not in errors:
+                errors.append(instance)
+
+        print(errors)
 
         cmds.select(errors)
 
@@ -65,21 +80,12 @@ def plugin_factory(func, **kwargs):
         def process(self, instance, context):
             mesh_names = instance[:]
             for mesh_name in mesh_names:
-                my_exception = None
-                try:
-                    func = self._func[0]
-                    errors = func(mesh_name, **kwargs)
-                except Exception as ex:
-                    errors = [mesh_name]
-                    my_exception = ex
+                func = self._func[0]
+                errors = func(mesh_name, **kwargs)
 
                 temp_list = context.data.get(self.label, [])
                 temp_list.extend(errors)
                 context.data[self.label] = temp_list  # save failed results for reuse later
-
-                # raise exception to prevent original exceptions to be hidden by the following assert.
-                if my_exception:
-                    raise my_exception
 
                 assert not errors, 'check failed on:' + str(errors)
 
@@ -122,16 +128,11 @@ class ActionFix(pyblish.api.Action):
         # because pyblish doesnt support getting instances from a plugin yet
         # we have to do this manually :(
         # if only we would get the plugin instances when using an action
-        instances = []
-        for result in context.data["results"]:
-            if result["error"] and result["plugin"] == plugin:
-                instance = result["instance"]
-                instances.extend(instance)
-
+        failed_instances = get_failed_instances()
         # instances = pyblish.logic.instances_by_plugin(plugin)
 
         func = plugin._func[0]
-        for mesh_name in instances:
+        for mesh_name in failed_instances:
             func(mesh_name, fix=True)
 
 
